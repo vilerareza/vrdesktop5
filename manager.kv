@@ -1,0 +1,33 @@
+#: import maintabs maintabs
+
+<Manager>:
+    orientation : 'horizontal'
+    headerBar : header_layout
+    mainTabs : main_tabs 
+
+    FloatLayout:    # Header Bar
+        id : header_layout
+        tabStrip : tab_strip
+        size_hint : (None, 1)
+        width : dp(40)
+        canvas.before :
+            Color : 
+                rgb : (0,0,0)
+            Rectangle :
+                size : self.size
+                pos : self.pos
+
+        TabbedPanelStrip:
+            id : tab_strip
+            cols : 1
+            rows : 4
+            spacing : 10
+            tabbed_panel : main_tabs
+            size_hint : (1, None)
+            height : dp (200)
+            pos_hint : {'top' : 0.95}
+
+    MainTabs:      # App Content Tabs
+        id : main_tabs
+        size_hint : (1,1)
+        tab_pos : 'left_top'
