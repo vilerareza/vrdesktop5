@@ -32,7 +32,7 @@ class DeviceIcon(FloatLayout):
         
         def callback_fail(*args):
             # Disable the frame
-            self.isEnabled = False
+            #self.isEnabled = False
             self.statusImage.source = "images/unavailable.png"
             self.deviceLabel.text = "[color=777777]"+self.deviceName+"[/color]"
 

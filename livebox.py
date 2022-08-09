@@ -33,7 +33,10 @@ class LiveBox(MDFloatLayout, HoverBehavior):
     moveEvent = None
     # test stream url
     testUrl = "images/test.mp4"
+    # Movement
     moveEnabled = True
+    moveRepetitionSec = 0.3
+    moveDistance = 10
     # servo parameter
     servo_center_pos = 7
     servo_max_move = 1.7
@@ -101,17 +104,17 @@ class LiveBox(MDFloatLayout, HoverBehavior):
             self.wsapp.close()
     
     def stop_live_stream (self):
-        try:
-            # Close the websocket connection
-            self.wsapp.close()
-            # If websocket thread exist
-            if self.wst:
-                self.wst.join()    
+        try:  
             # Stopping the audio stream anyway
             self.stop_audio_in()
             self.stop_audio_out()
             # Reset the live action bar button state
             self.liveActionBar.reset()
+            # Close the websocket connection
+            self.wsapp.close()
+            # If websocket thread exist
+            if self.wst:
+                self.wst.join()  
             # Change status
             self.status = "stop"
         except Exception as e:
@@ -147,62 +150,95 @@ class LiveBox(MDFloatLayout, HoverBehavior):
         self.moveRight.opacity  = 0
         self.moveUp.opacity  = 0
         self.moveDown.opacity  = 0
-
+    
     def button_touch_down(self, *args):
         if args[0].collide_point(*args[1].pos):
             if args[0] == self.moveLeft:
+                # Move left
                 print ('touch down left')
                 if not self.moveEvent:
+                    # Change button appearance
                     args[0].source = 'images/moveleft_down.png'
-                    self.start_move_left()    # move once
-                    self.moveEvent = Clock.schedule_interval(self.start_move_left, 0.3)
+                    # Move once
+                    self.start_move(dir = 'L', distance = self.moveDistance)
+                    # Continue movement with interval if the button is still pressed
+                    self.moveEvent = Clock.schedule_interval(partial(
+                        self.start_move,
+                        dir = 'L',
+                        distance = self.moveDistance
+                        ), self.moveRepetitionSec
+                    )
             if args[0] == self.moveRight:
+                # Move right
                 print ('touch down right')
                 if not self.moveEvent:
+                    # Change button appearance
                     args[0].source = 'images/moveright_down.png'
-                    self.start_move_right()    # move once
-                    self.moveEvent = Clock.schedule_interval(self.start_move_right, 0.3)
+                    # Move once
+                    self.start_move(dir = 'R', distance = self.moveDistance)
+                    # Continue movement with interval if the button is still pressed
+                    self.moveEvent = Clock.schedule_interval(partial( 
+                        self.start_move,
+                        dir = 'R',
+                        distance = self.moveDistance
+                        ), self.moveRepetitionSec
+                    )
             if args[0] == self.moveUp:
+                # Move up
                 print ('touch down up')
                 if not self.moveEvent:
+                    # Change button appearance
                     args[0].source = 'images/moveup_down.png'
-                    self.start_move_up()    # move once
-                    self.moveEvent = Clock.schedule_interval(self.start_move_up, 0.3)
+                    # Move once
+                    self.start_move(dir = 'U', distance = self.moveDistance)
+                    # Continue movement with interval if the button is still pressed
+                    self.moveEvent = Clock.schedule_interval(partial( 
+                        self.start_move,
+                        dir = 'U',
+                        distance = self.moveDistance
+                        ), self.moveRepetitionSec
+                    )
             if args[0] == self.moveDown:
+                # Move down
                 print ('touch down down')
                 if not self.moveEvent:
+                    # Change button appearance
                     args[0].source = 'images/movedown_down.png'
-                    self.start_move_down()    # move once
-                    self.moveEvent = Clock.schedule_interval(self.start_move_down, 0.3)
+                    # Move once
+                    self.start_move(dir = 'D', distance = self.moveDistance)
+                    # Continue movement with interval if the button is still pressed
+                    self.moveEvent = Clock.schedule_interval(partial( 
+                        self.start_move,
+                        dir = 'D',
+                        distance = self.moveDistance
+                        ), self.moveRepetitionSec
+                    )
 
     def button_touch_up(self, *args):
         if args[0].collide_point(*args[1].pos):
             print ('touch up')
+            # Stop the movement / cancel the repetitive movement
             if self.moveEvent:
-                self.move_cancel(self.moveEvent)
+                self.moveEvent.cancel()
                 self.moveEvent = None
+                # Return the movement control buttons appearance
                 self.moveLeft.source = 'images/moveleft_normal.png'
                 self.moveRight.source = 'images/moveright_normal.png'
                 self.moveUp.source = 'images/moveup_normal.png'
                 self.moveDown.source = 'images/movedown_normal.png'
-
-    def move_cancel(self, moveEvent = None):
-        if moveEvent:
-            moveEvent.cancel()
-            moveEvent = None
-        return
     
-    def start_move(self, dir = 'L', distance = 10, *args):
-        if dir != 'L' or dir != 'R' or dir != 'T' or dir != 'B':
+    def start_move(self, clock = None, dir = 'C', distance = 0):
+        if dir != 'L' and dir != 'R' and dir != 'U' and dir != 'D' and dir != 'C':
             print ('Direction not valid')
             return False
         def move(dir, distance):
-            print (f'Move: {dir}')
-            data = {'dir':dir, 'dist':distance}
+            data = {'op': 'mv', 'dir':dir, 'dist':distance}
             try:
-                self.wsapp.send(json.loads(data))
+                self.wsapp.send(json.dumps(data))
+                return True
             except Exception as e:
                 print (f'{e}: Error sending move command to server')
+                return False
         # Start the move thread
         Thread(target = partial(move, dir ,distance)).start()
  
@@ -215,7 +251,8 @@ class LiveBox(MDFloatLayout, HoverBehavior):
                 self.moveLeft.collide_point(*touch.pos) or
                 self.moveRight.collide_point(*touch.pos) or
                 self.moveUp.collide_point(*touch.pos) or
-                self.moveDown.collide_point(*touch.pos)):
+                self.moveDown.collide_point(*touch.pos) or
+                self.liveActionBar.collide_point(*touch.pos)):
 
                 touchPos = (touch.pos[0]-self.liveStream.x, touch.pos[1]-self.liveStream.y)
                 # Calculate move distance
@@ -223,17 +260,16 @@ class LiveBox(MDFloatLayout, HoverBehavior):
 
                 if distance_x > 0.1:
                     # Touch is at left area
-                    self.start_move_left(abs(distance_x))
+                    self.start_move(dir = 'L', distance = abs(distance_x))
                 elif distance_x < -0.1:
                     # Touch is at right area
-                    self.start_move_right(abs(distance_x))
-
+                    self.start_move(dir = 'R', distance = abs(distance_x))
                 if distance_y > 0.1:
                     # Touch is at lower area
-                    self.start_move_down(abs(distance_y))
+                    self.start_move(dir = 'D', distance = abs(distance_y))
                 elif distance_y < -0.1:
                     # Touch is at upper area
-                    self.start_move_up(abs(distance_y))
+                    self.start_move(dir = 'U', distance = abs(distance_y))
 
                 print (f'touch pos: {touchPos}')
 
@@ -272,3 +308,15 @@ class LiveBox(MDFloatLayout, HoverBehavior):
         if self.audioTransmitter:
             self.audioTransmitter.stop_stream()
             self.audioTransmitter = None
+
+    def light(self, on = False ):
+        def light_on():
+            data = {'op': 'lt', 'on' : on}
+            try:
+                self.wsapp.send(json.dumps(data))
+                return True
+            except Exception as e:
+                print (f'{e}: Error sending light command to server')
+                return False
+        # Start the light thread
+        Thread(target = light_on).start()

@@ -1,4 +1,6 @@
 <LogContentBox>
+    logFaceLayout : log_face_layout
+    logFrameLayout : log_frame_layout
 
     orientation : 'vertical'
 
@@ -31,16 +33,14 @@
                 center_x: upper_label_container.center_x
                 top: upper_label_container.top - dp(10)
 
-        FaceImageStack:
+        LogFaceStack:
         # The layout for displaying detected face images of selected id
-            myroot : root
-
-            id: face_image_stack
+            frameLayout : root.logFrameLayout
+            id: log_face_layout
             padding: [20]
             spacing: 10
 
             size_hint : (1, 1)
-
 
     BoxLayout:
     # Lower container
@@ -72,7 +72,7 @@
                 top: lower_label_container.top - dp(10)
 
         FloatLayout:
-            id : frame_image_float
+            id : log_frame_layout
             size_hint : (1, 1)
                 
 

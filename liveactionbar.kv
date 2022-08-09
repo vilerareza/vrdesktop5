@@ -27,15 +27,25 @@
             pos_hint : {'center_x' : 0.5, 'center_y' : 0.5}
 
     BoxLayout:
-        id : movement_actionbar_box
+        id : centering_box
         ImageButton:
-            id : movement_actionbar_icon
-            source : 'images/movement_normal.png'
+            id : centering_actionbar_icon
+            source : 'images/centering_normal.png'
             size_hint : (1, 0.8)
             pos_hint : {'center_x' : 0.5, 'center_y' : 0.5}
             #on_touch_down: root.button_touch_action(*args)
             on_press : root.button_press_callback(self)
             on_release : root.button_release_callback(self)
+
+    BoxLayout:
+        id : light_box
+        ImageToggle:
+            id : light_icon_button
+            source : 'images/light_normal.png'
+            mimpap : True
+            size_hint : (1, 0.8)
+            pos_hint : {'center_x' : 0.5, 'center_y' : 0.5}
+            on_state : root.toggle_press_callback(self)
 
     BoxLayout :
         id : speaker_icon_box

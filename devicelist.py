@@ -9,6 +9,8 @@ class DeviceList (FocusBehavior, CompoundSelectionBehavior, StackLayout):
 
     selectedDevice = ObjectProperty(None)
     isDeviceSelected = BooleanProperty(False)
+    # Handle property to the serverBox layout
+    serverBox = ObjectProperty(None)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         if super().keyboard_on_key_down(window, keycode, text, modifiers):
@@ -35,15 +37,16 @@ class DeviceList (FocusBehavior, CompoundSelectionBehavior, StackLayout):
     def widget_touch_up(self, widget, touch):
         if self.collide_point(*touch.pos) and (not (widget.collide_point(*touch.pos) or self.touch_multiselect)):
             pass
-            #self.deselect_node(widget)
     
     def select_node(self, node):
-        #node.color = (0,1,0)
         node.image.source = 'images/device_selected7.png'
         node.label.font_size = 16
         node.label.text="[color=ffffff]"+node.deviceName+"[/color]"
         self.selectedDevice = node
         self.isDeviceSelected = True
+        # Clearing the selection in serverBox layout
+        if self.serverBox:
+            self.serverBox.deselect_serverIcon()
         return super().select_node(node)
         
     def deselect_node(self, node):
@@ -51,19 +54,13 @@ class DeviceList (FocusBehavior, CompoundSelectionBehavior, StackLayout):
         node.image.source = 'images/not_device_selected5.png'
         node.label.font_size = 16
         node.label.text="[color=cccccc]"+node.deviceName+"[/color]"
-        # Check if nothing is selected
-        # print (str(len(self.selected_nodes)))
-        # if len(self.selected_nodes) == 0:
-        #     self.isDeviceSelected = False
-        #     #self.selectedDevice = ObjectProperty(None)
-        #     print ('nothing is selected')
     
     def clear_selection(self, widget=None):
         return super().clear_selection()
 
     def on_selected_nodes(self,grid,nodes):
         pass
-    
+
     def activate_neuralnet_to_selected_device(self, deviceInfo, neuralNetActivated):
         if self.selectedDevice:
             self.selectedDevice.visionAI = neuralNetActivated

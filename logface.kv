@@ -1,6 +1,6 @@
-<LogListBox>:
+<LogFaceObjectBox>:
     orientation: 'vertical'
-    logListStack : log_list_stack 
+    stackLayout : logfaceobject_stack 
     canvas.before:
         Color:
             rgb: 0.2, 0.2, 0.2
@@ -43,8 +43,9 @@
             size_hint : (1, None)
             height : dp (40)
                         
-    LogListStack:
+    LogFaceObjectStack:
         # The layout for displaying the log content
-        id : log_list_stack
+        contentLayout : root.contentBox
+        id : logfaceobject_stack
         padding: [20]
         spacing: 10

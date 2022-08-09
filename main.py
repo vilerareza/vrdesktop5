@@ -22,3 +22,4 @@ class VsDesktopApp(App):
         self.manager.stop()
 
 VsDesktopApp().run()
+

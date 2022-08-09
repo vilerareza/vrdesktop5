@@ -1,6 +1,6 @@
 <SettingView>:
     leftBox : left_box
-    deviceEntry : device_entry
+    serverBox : server_box
     deviceList : device_list
     deviceInfo : device_info
 
@@ -9,45 +9,51 @@
         orientation : 'vertical'
         size_hint : (1.5,1)
 
-        DeviceEntry:
-            id : device_entry
+        ServerBox:
+            id : server_box
+            deviceListLayout : device_list.deviceListLayout
             size_hint : (1, 0.5)
         
-        BoxLayout:
-            id : device_list_box
-            orientation : 'vertical'
-            canvas.before:
-                Color:
-                    rgb : (0.3,0.3,0.3)
-                Rectangle:
-                    size : self.size
-                    pos : self.pos
+        DeviceListBox:
+            id : device_list
+            serverBox : server_box
 
-            BoxLayout:
-                # Container for control buttons
-                orientation : 'horizontal'
-                size_hint : (1, None)
-                height : dp(50)
+        #BoxLayout:
+        #    id : device_list_box
+        #    orientation : 'vertical'
+        #    canvas.before:
+        #        Color:
+        #            rgb : (0.3,0.3,0.3)
+        #        Rectangle:
+        #            size : self.size
+        #            pos : self.pos
 
-                FloatLayout:
-                    id : button_float
-                    size_hint : (1, 1)
-                    # height : dp (40)
+        #    BoxLayout:
+        #        # Container for control buttons
+        #        orientation : 'horizontal'
+        #        size_hint : (1, None)
+        #        height : dp(50)
 
-                    ImageButton:
-                        id : device_delete_button
-                        source: 'images/settingview/delete_device_normal.png'
-                        size_hint: (None, None)
-                        size: (35, 35)
-                        y : button_float.y
-                        right : button_float.right - dp(20)
-                        on_press : root.button_press_callback(self)
-                        on_release : root.button_release_callback(self), root.remove_from_db()
+        #        FloatLayout:
+        #            id : button_float
+        #            size_hint : (1, 1)
+        #            # height : dp (40)
 
-            DeviceList:
-                id : device_list
-                spacing : 20
-                padding : [40, 20, 40, 40]
+        #           ImageButton:
+        #                id : device_delete_button
+        #                source: 'images/settingview/delete_device_normal.png'
+        #                size_hint: (None, None)
+        #                size: (35, 35)
+        #                y : button_float.y
+        #                right : button_float.right - dp(20)
+        #                on_press : root.button_press_callback(self)
+        #                on_release : root.button_release_callback(self), root.remove_from_db()
+
+        #    DeviceList:
+        #        id : device_list
+        #        serverBox : server_box
+        #        spacing : 20
+        #        padding : [40, 20, 40, 40]
 
     DeviceInfo:
         id : device_info

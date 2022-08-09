@@ -7,23 +7,15 @@ Builder.load_file('logfaceitem.kv')
 
 class LogFaceItem(ButtonBehavior, FloatLayout):
     selected = BooleanProperty (False)
-    dataID = ''
-    dateStamp = ''
-    timeStamp = ''
     dataImage = ObjectProperty(None)
     backgroundImage = ObjectProperty(None)
     
-    def __init__(self, string_data_list, image_path, **kwargs):
+    def __init__(self, log_id, time_stamp, face_texture, frame_id, bbox,**kwargs):
         super().__init__(**kwargs)
-        self.dataID = string_data_list[0]
-        self.dateStamp = string_data_list[2]
-        self.timeStamp = string_data_list[3]
-        if self.dateStamp:
-            self.ids.date_label.text = self.dateStamp
-        else:
-            self.ids.date_label.text = '...'
-        if self.timeStamp:
-            self.ids.time_label.text = self.timeStamp 
-        else:
-            self.ids.time_label.text = '...'
-        self.dataImage.source = image_path
+        self.logID = log_id
+        self.timeStamp = time_stamp
+        self.frameID = frame_id
+        self.bbox = bbox
+        self.ids.date_label.text = self.timeStamp.strftime("%Y-%m-%d")
+        self.ids.time_label.text = self.timeStamp.strftime("%H:%M:%S")
+        self.dataImage.texture = face_texture

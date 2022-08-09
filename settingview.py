@@ -1,11 +1,13 @@
 import requests
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty, ListProperty
+from kivy.properties import ListProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from deviceentry import DeviceEntry
 from deviceinfo import DeviceInfo
 from deviceitem import DeviceItem
 from devicelist import DeviceList
+from serverbox import ServerBox
+from devicelistbox import DeviceListBox
 
 Builder.load_file("settingview.kv")
 
@@ -13,7 +15,7 @@ class SettingView(BoxLayout):
 
     leftBox = ObjectProperty(None)
     deviceInfo = ObjectProperty(None)
-    deviceEntry = ObjectProperty(None)
+    serverBox = ObjectProperty(None)
     tAddress = ObjectProperty(None)
     tName = ObjectProperty(None)
     bAdd = ObjectProperty(None)
@@ -143,15 +145,15 @@ class SettingView(BoxLayout):
         # Get devices
         devices = self.get_devices()
         # Binding on_press event of add button
-        self.deviceEntry.bind(isNewDevice = self.add_to_db)
+        # self.deviceEntry.bind(isNewDevice = self.add_to_db)
         # Device list
-        self.deviceList.bind(selectedDevice = self.deviceInfo.display_info)
+        #self.deviceList.bind(selectedDevice = self.deviceInfo.display_info)
         # Populate device list from database
-        self.populate_items_to_list(self.deviceList, devices)
+        self.populate_items_to_list(self.deviceList.deviceListLayout, devices)
         # # Device info
         self.deviceInfo.bind(editMode = self.save_to_db)
-        self.deviceInfo.removeButton.bind(on_press = self.deviceList.clear_selection)
-        self.deviceInfo.bind(visionAIActivated = self.deviceList.activate_neuralnet_to_selected_device)
+        #self.deviceInfo.removeButton.bind(on_press = self.deviceList.clear_selection)
+        #self.deviceInfo.bind(visionAIActivated = self.deviceList.activate_neuralnet_to_selected_device)
         self.deviceInfo.dbDeviceNames = self.get_device_name_db()
         # Binding Device Info and Device List
-        self.deviceList.bind(isDeviceSelected = self.deviceInfo.change_config)
+        #self.deviceList.bind(isDeviceSelected = self.deviceInfo.change_config)

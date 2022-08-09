@@ -1,12 +1,13 @@
 #: import logcontentbox logcontentbox
-#: import loglistbox loglistbox
+#: import logface logface
 
 <LogView>:
     orientation: 'horizontal'
     manager : app.manager
 
-    LogListBox:     # BoxLayout
-        id : log_list_box
+    LogFaceObjectBox:     # BoxLayout
+        contentBox : log_content_box
+        id : logfaceobject_box
         size_hint : (1, 1)
 
     LogContentBox:

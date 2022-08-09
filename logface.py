@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from kivy.properties import BooleanProperty, ObjectProperty 
 from kivy.lang import Builder
 from kivy.app import App
@@ -7,34 +8,37 @@ from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.uix.behaviors import FocusBehavior
 
-from databaseitem import DatabaseItem
+from databaseitem import FaceObjectWidget
 
-Builder.load_file('loglistbox.kv')
+Builder.load_file('logface.kv')
 
-class LogListBox(BoxLayout):
+class LogFaceObjectBox(BoxLayout):
 
-    logListStack = ObjectProperty(None)
-    
+    stackLayout = ObjectProperty(None)
+    contentBox = ObjectProperty(None)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     
-    def add_item(self, string_data_list, image_folder):
-        imageFiles = os.listdir(image_folder)
-        # Display first image only
-        filePath = os.path.join(image_folder, imageFiles[0])
-        self.logListStack.add_widget(DatabaseItem(string_data_list, filePath))
+    def add_item(self, id, str_datalist, face_texture):
+        self.stackLayout.add_widget(FaceObjectWidget(id, str_datalist, face_texture))
 
 
-class LogListStack (FocusBehavior, CompoundSelectionBehavior, StackLayout):
+class LogFaceObjectStack (FocusBehavior, CompoundSelectionBehavior, StackLayout):
 
     selectedData = ObjectProperty(None)
+    contentLayout = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.bind(selectedData = self.inform_selection)
+        self.bind(selectedData = self.show_data_content)
 
-    def inform_selection(self, layout, selected_data):
-        App.get_running_app().manager.mainTabs.logView.display_data_content(selected_data)
+    def show_data_content(self, *args):
+        '''display data content in content layout'''
+        if self.contentLayout:
+            # below function returns: id, dataID, dataFirstName, dataLastName, dataImage
+            id,_,_,_,_ = self.selectedData.get_data()
+            self.contentLayout.display_detection_log(id)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         if super().keyboard_on_key_down(window, keycode, text, modifiers):

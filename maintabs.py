@@ -43,11 +43,6 @@ class MainTabs(TabbedPanel):
         self.tabMultiView.bind(on_press=self.refreshMultiView)
         self.tabDatabaseView.bind(on_press=self.tabDatabaseViewPressed)
 
-        self.initialize_settingView()
-
-    def initialize_settingView(self):
-        self.settingView.deviceEntry.icon_mode()
-
     def tabSettingViewPressed(self, tab):
         if tab.state == "down":
             # Stop the multiview

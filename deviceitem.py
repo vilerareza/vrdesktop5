@@ -32,12 +32,3 @@ class DeviceItem(FloatLayout):
         #self.deviceLabel = Label(text = "", font_size = 18, font_family = "arial", halign = 'center', valign = 'middle', size_hint = (None, None), size = (120,40), pos_hint = {'center_x':0.5, 'center_y': 0.5}
         self.add_widget (self.image)
         self.add_widget (self.label)
-    #     with self.canvas.before:
-    #         Color(self.color[0],self.color[1],self.color[2])
-    #         #Color(random.random(),random.random(),random.random())
-    #         self.rect = Rectangle (pos=self.pos, size = self.size)
-    #         self.bind (pos = self.update_rect, size = self.update_rect)
-    
-    # def update_rect(self, *args):
-    #     self.rect.pos = self.pos
-    #     self.rect.size = self.size

@@ -1,11 +1,15 @@
-import os
-import uuid
+import io
+import base64
+import pickle
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty
+from kivy.core.image import Image as CoreImage
 
 import numpy as np
-from cv2 import imwrite
+from cv2 import imencode
+
+import requests
 
 Builder.load_file('logview.kv')
 
@@ -13,59 +17,49 @@ class LogView(BoxLayout):
 
     manager = ObjectProperty(None)
 
-    logListTempImagePath = 'images/temp/loglist/'
-
     def on_parent(self, *args):
-        database = self.get_database()
-        #if not self.log:
-        log = self.get_log()
-        self.display_log(log, database)
+        logs_faceID = self.get_log()
+        self.display_log(logs_faceID)
 
-    def add_to_list(self, image_folder, string_data_list): 
-        # draw the new data to the database list box object 
-        self.ids.log_list_box.add_item(string_data_list = string_data_list, image_folder = image_folder)
+    def get_log(self):
+        try:
+            # Sending request
+            r = requests.get("http://127.0.0.1:8000/api/log/faceid/")
+            # Getting and parsing response
+            log_response = r.json()  # Produce list of dict
+            print ('GET log OK')
+            return log_response
+        except Exception as e:
+            print (e)
+            return []
 
-    def display_data_content(self, selected_data):
-        '''
-        selected_data is DatabaseItem object with the following properties
-            dataID = ''
-            dataFirstName = ''
-            dataLastName = ''
-            dataImage = ObjectProperty(None)
-            backgroundImage = ObjectProperty(None)
-        '''
-        # Retrieve data from log database
-        dataID = selected_data.dataID
-        dataAttributes = self.get_log_attributes(dataID)
-        self.ids.log_content_box.display_data(dataAttributes)
+    def clear_layout(self, layout):
+        layout.clear_widgets()
 
-    def create_image_from_np(self, np_image, destination):
-        uuidName = uuid.uuid4()
-        writePath = (f'{destination}{uuidName}.png')
-        imwrite(writePath, np_image)
+    def display_log(self, log):
+        # Clearing log grid layout
+        self.clear_layout(self.ids.logfaceobject_box.stackLayout)
+        faceids = self.get_logs_faceids(log)
+        print (f'FACEIDS: {len(faceids)}')
+        for id in faceids:
+            # Sending request
+            r = requests.get(f"http://127.0.0.1:8000/api/face/{id}")
+            face_response = r.json()
+            self.show_faceobject(self.ids.logfaceobject_box, faceobject_data=face_response)
 
-    def clear_images(self, imagesLocation = '', gridLayout = None):
-        # Removing image files in temp preview directory 
-        if imagesLocation != '':
-            images = os.listdir(imagesLocation)
-            for image in images:
-                os.remove(os.path.join(imagesLocation, image))
-        # Clearing displayed images in image viewer grid layout
-        if gridLayout:
-            gridLayout.clear_widgets()
-            gridLayout.nLive = 0
-
-    def display_log(self, log, database):
-        # Clearing buffer and layout
-        self.clear_images(self.logListTempImagePath, gridLayout = self.ids.log_list_box.logListStack)
-        ids = self.get_log_ids(log)
-        for id in ids:
-            faceImg = database[id][3][0]   # Only take the first image from the list
-            self.create_image_from_np(faceImg, self.logListTempImagePath)
-            string_data_list = [id, database[id][0], database[id][1]]
-            self.add_to_list(self.logListTempImagePath, string_data_list)
-            # Clearing images in buffer location
-            self.clear_images(self.logListTempImagePath)
+    def show_faceobject(self, widget, faceobject_data):
+        '''Display face object in the widget'''
+        id = faceobject_data['id']
+        str_datalist = [
+            faceobject_data['faceID'], 
+            faceobject_data['firstName'],
+            faceobject_data['lastName']
+            ]
+        faceDataStr = faceobject_data['faceData']
+        faceDataNp = pickle.loads(base64.b64decode(faceDataStr))
+        _, faceDataBytes = imencode(".jpg", faceDataNp)
+        coreImg = CoreImage(io.BytesIO(faceDataBytes), ext = 'jpg')
+        widget.add_item(id = id, str_datalist = str_datalist, face_texture = coreImg.texture)
 
     def get_log_attributes(self, face_id):
         return self.manager.get_log_attributes(face_id)
@@ -74,17 +68,14 @@ class LogView(BoxLayout):
         # Get database from manager
         return self.manager.get_facedatabase()
 
-    def get_log(self):
-        return self.manager.get_log()
-
-    def get_log_ids(self, log):
-        # Get faceID from detection log
+    def get_logs_faceids(self, logs):
+        # Get face ID from detection log
         ids = []
-        for record in log:
-            id = record[0]
+        for log in logs:
+            id = log['objectID']
             ids.append(id)
-        ids = np.unique(ids)
-        return ids
+        faceids = np.unique(ids)
+        return faceids
 
 
     
