@@ -16,9 +16,10 @@ class DeviceIcon(FloatLayout):
     t_status_checker = None
     stop_flag = False
 
-    def __init__(self, deviceName, **kwargs):
+    def __init__(self, deviceName, server_address, **kwargs):
         super().__init__(**kwargs)
         self.deviceName = deviceName
+        self.serverAddress = server_address
         self.condition = threading.Condition()
 
     def start_status_checker(self):
@@ -41,7 +42,7 @@ class DeviceIcon(FloatLayout):
                 ## if the application exit then break the loop
                 time.sleep(3)
                 try:
-                    r = (requests.get(f"http://127.0.0.1:8000/stream/status/device1/")).json()
+                    r = (requests.get(f"{self.serverAddress}/stream/status/device1/")).json()
                     if r['stream'] == True:
                         Clock.schedule_once(callback_ok, 0)
                     else:

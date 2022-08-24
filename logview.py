@@ -16,6 +16,8 @@ Builder.load_file('logview.kv')
 class LogView(BoxLayout):
 
     manager = ObjectProperty(None)
+    # Server
+    serverAddress = ''
 
     def on_parent(self, *args):
         logs_faceID = self.get_log()
@@ -24,7 +26,7 @@ class LogView(BoxLayout):
     def get_log(self):
         try:
             # Sending request
-            r = requests.get("http://127.0.0.1:8000/api/log/faceid/")
+            r = requests.get(f"{self.serverAddress}/api/log/faceid/")
             # Getting and parsing response
             log_response = r.json()  # Produce list of dict
             print ('GET log OK')
@@ -43,7 +45,7 @@ class LogView(BoxLayout):
         print (f'FACEIDS: {len(faceids)}')
         for id in faceids:
             # Sending request
-            r = requests.get(f"http://127.0.0.1:8000/api/face/{id}")
+            r = requests.get(f"{self.serverAddress}/api/face/{id}")
             face_response = r.json()
             self.show_faceobject(self.ids.logfaceobject_box, faceobject_data=face_response)
 
@@ -76,6 +78,19 @@ class LogView(BoxLayout):
             ids.append(id)
         faceids = np.unique(ids)
         return faceids
+
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                self.serverAddress = pickle.load(file)
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
 
 
     

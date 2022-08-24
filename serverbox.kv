@@ -1,14 +1,15 @@
 <ServerBox>:
-    serverIcon : server_icon
+    serverItem : server_item
     titleLabel : title_label
 
-    ServerIcon:
-        id : server_icon
+    ServerItem:
+        id : server_item
         size_hint : (None, None)
         size : (dp(150), dp(120))
         center_x : root.center_x
         center_y : root.center_y
-        on_state : root.icon_press_callback(self)
+        #on_state : root.item_press_callback(self)
+        on_touch_down: root.item_touch_down(*args)
 
     Label:
         id: title_label
@@ -22,22 +23,3 @@
         font_family: "arial"
         x: root.x + dp(30)
         top: root.top - dp(20)
-
-
-<ServerIcon@ToggleButtonBehavior+FloatLayout>:
-    serverImage : server_image
-    statusImage : status_image
-
-    Image:
-        id : server_image
-        pos_hint : {'center_x':0.5, 'center_y': 0.5}
-        size_hint : (1,1)
-        source : 'images/settingview/servericon_normal.png'
-    Image:
-        id : status_image
-        top: root.top - dp(25)
-        right : root.right - dp(45)
-        #pos_hint : {'center_x':0.5, 'center_y': 0.5}
-        size_hint : (None, None)
-        size : (dp(30), dp(30))
-        source : 'images/settingview/statusicon_active.png'

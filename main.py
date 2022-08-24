@@ -10,7 +10,7 @@ class VsDesktopApp(App):
 
     manager = ObjectProperty(None)
     stop_flag = BooleanProperty(False)
-    
+     
     def build (self):
         Window.minimum_width, Window.minimum_height = (500, 500)
         self.manager = Manager()

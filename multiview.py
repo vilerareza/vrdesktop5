@@ -1,4 +1,5 @@
 import requests
+import pickle
 from kivy.lang import Builder
 from kivy.properties import ListProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
@@ -28,11 +29,7 @@ class Multiview(BoxLayout):
     # Database
     db = ObjectProperty({'dbName': 'test.db', 'tableName': 'camera'})
     # Server
-    serverHost = '127.0.0.1:8000'
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.liveGrid.bind(size = self.adjust_livebox_size)
+    serverAddress = ''
 
     def get_data_from_db(self):
         # Clearing previous device stream objects and icons if any
@@ -40,7 +37,7 @@ class Multiview(BoxLayout):
             self.stop()
         # Retrieve devices from server REST API
         try:
-            r = requests.get(f"http://{self.serverHost}/api/device")
+            r = requests.get(f"{self.serverAddress}/api/device/")
             device_response = r.json()  # Produce list of dict
             # Create device icon and live box
             self.create_deviceicon_livebox(devices = device_response)
@@ -155,34 +152,18 @@ class Multiview(BoxLayout):
             deviceVisionAI = device['visionAI']
             # Fill device icon list
             self.deviceIcons.append(DeviceIcon(
-                deviceName = deviceName,
+                deviceName = deviceName, 
+                server_address = self.serverAddress,
                 size_hint = (None, None),
                 size = (181, 45)
                 )
             )
             # Fill live box object list
-            if deviceVisionAI == True:
-                # If device vision AI is activated then activate the Vision AI
-                aiModel = self.manager.create_vision_ai()
-                faceDatabase = self.manager.get_facedatabase()
-                if aiModel:
-                    # Create livebox with detector and model
-                    self.liveBoxes.append(LiveBox(
-                        server_url = self.serverHost,
-                        device_name = deviceName,
-                        model = aiModel,
-                        face_database = faceDatabase 
-                        )
-                    )
-                else:
-                    print ('Model not exist')
-            else:
-                # If device vision AI is not activate then create livebox without detector and model
-                self.liveBoxes.append(LiveBox(
-                    server_url = self.serverHost,
-                    device_name = deviceName
-                    )
+            self.liveBoxes.append(LiveBox(
+                server_url = self.serverAddress,
+                device_name = deviceName
                 )
+            )
         # Add deviceIcon content to selection box
         self.add_deviceicon_to_selectionbox(
             item_list = self.deviceIcons,
@@ -203,3 +184,17 @@ class Multiview(BoxLayout):
             self.selectionScroll.scroll_x -= 0.1
             if self.selectionScroll.scroll_x <= 0:
                 self.selectionScroll.scroll_x = 0
+
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                self.serverAddress = pickle.load(file)
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
+        self.liveGrid.bind(size = self.adjust_livebox_size)

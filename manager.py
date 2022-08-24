@@ -130,6 +130,6 @@ class Manager(BoxLayout):
             detectionAttrs.append(attr)
         con.close()
         return detectionAttrs
-    
+
     def stop(self):
         self.mainTabs.stop()

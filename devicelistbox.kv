@@ -1,5 +1,6 @@
 <DeviceListBox>:
     deviceListLayout : device_list_layout
+    btnDeviceAdd: device_add_button
     orientation: 'vertical'
     canvas.before:
         Color:
@@ -36,18 +37,19 @@
             # height : dp (40)
 
             ImageButton:
-                id : device_delete_button
-                source: 'images/settingview/delete_device_normal.png'
+                id : device_add_button
+                source: 'images/settingview/btn_add_icon.png'
                 size_hint: (None, None)
-                size: (35, 35)
+                size: (75, 40)
                 y : button_float.y
                 right : button_float.right - dp(20)
                 on_press : root.button_press_callback(self)
-                on_release : root.button_release_callback(self), root.remove_from_db()
+                on_release : root.button_release_callback(self)
 
     DeviceList:
         id : device_list_layout
         serverBox : root.serverBox
+        settingContentBox : root.settingContentBox
         spacing : 20
         padding : [40, 20, 40, 40]
         canvas.before:

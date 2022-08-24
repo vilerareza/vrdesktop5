@@ -25,8 +25,8 @@ class MainTabs(TabbedPanel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.multiView = Multiview()
         self.settingView = SettingView()
+        self.multiView = Multiview()
         self.databaseView = DatabaseView()
         self.logView = LogView()
 
@@ -42,6 +42,7 @@ class MainTabs(TabbedPanel):
         self.tabSettingView.bind(on_press=self.tabSettingViewPressed)
         self.tabMultiView.bind(on_press=self.refreshMultiView)
         self.tabDatabaseView.bind(on_press=self.tabDatabaseViewPressed)
+        self.tabLogView.bind(on_press = self.tabLogViewPressed)
 
     def tabSettingViewPressed(self, tab):
         if tab.state == "down":
@@ -51,6 +52,7 @@ class MainTabs(TabbedPanel):
     def refreshMultiView(self, tab):
         if tab.state == "down":
             # Refresh the device list
+            self.multiView.get_server_address()
             self.multiView.get_data_from_db()
             self.multiView.start_icons()
             # Showing initLabel
@@ -60,8 +62,13 @@ class MainTabs(TabbedPanel):
         if tab.state == "down":
             # Stop the multiview
             self.multiView.stop()
-            # Get database from manager
-            #self.databaseView.get_database()
+            self.databaseView.get_server_address()
+    
+    def tabLogViewPressed(self, tab):
+        if tab.state == "down":
+            # Stop the multiview
+            self.multiView.stop()
+            self.logView.get_server_address()
             
     def stop(self):
         self.multiView.stop()

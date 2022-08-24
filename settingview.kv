@@ -1,65 +1,32 @@
 <SettingView>:
-    leftBox : left_box
     serverBox : server_box
     deviceList : device_list
-    deviceInfo : device_info
-
+    settingContentBox : setting_content_box
+    
     BoxLayout:
         id : left_box
         orientation : 'vertical'
         size_hint : (1.5,1)
-
+        
         ServerBox:
             id : server_box
             deviceListLayout : device_list.deviceListLayout
+            settingContentBox : setting_content_box
             size_hint : (1, 0.5)
         
         DeviceListBox:
             id : device_list
             serverBox : server_box
+            settingContentBox : setting_content_box
 
-        #BoxLayout:
-        #    id : device_list_box
-        #    orientation : 'vertical'
-        #    canvas.before:
-        #        Color:
-        #            rgb : (0.3,0.3,0.3)
-        #        Rectangle:
-        #            size : self.size
-        #            pos : self.pos
-
-        #    BoxLayout:
-        #        # Container for control buttons
-        #        orientation : 'horizontal'
-        #        size_hint : (1, None)
-        #        height : dp(50)
-
-        #        FloatLayout:
-        #            id : button_float
-        #            size_hint : (1, 1)
-        #            # height : dp (40)
-
-        #           ImageButton:
-        #                id : device_delete_button
-        #                source: 'images/settingview/delete_device_normal.png'
-        #                size_hint: (None, None)
-        #                size: (35, 35)
-        #                y : button_float.y
-        #                right : button_float.right - dp(20)
-        #                on_press : root.button_press_callback(self)
-        #                on_release : root.button_release_callback(self), root.remove_from_db()
-
-        #    DeviceList:
-        #        id : device_list
-        #        serverBox : server_box
-        #        spacing : 20
-        #        padding : [40, 20, 40, 40]
-
-    DeviceInfo:
-        id : device_info
+    SettingContentBox:
+        id : setting_content_box
+        settingView: root
+        serverBox : server_box
+        deviceList : device_list
         canvas.before:
             Color:
-                rgb : (0.5,0.5,0.5)
+                rgb : (0.45,0.45,0.45)
             Rectangle:
                 size : self.size
                 pos : self.pos

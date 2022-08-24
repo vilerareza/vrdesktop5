@@ -15,6 +15,7 @@ class DatabaseView(BoxLayout):
     manager = ObjectProperty(None)
     databaseListLayout = ObjectProperty(None)
     faceImgTempDir = 'images/temp/face/'
+    serverAddress = ''
 
     def on_parent(self, *args):
         if self.parent != None:
@@ -94,7 +95,7 @@ class DatabaseView(BoxLayout):
         faceDict = {}
         try:
             # Sending request
-            r = requests.get("http://127.0.0.1:8000/api/face")
+            r = requests.get(f"{self.serverAddress}/api/face")
             # Getting and parsing response
             face_response = r.json()  # Produce list of dict
             for face in face_response:
@@ -112,9 +113,22 @@ class DatabaseView(BoxLayout):
     
     def remove_from_db(self, id):
         try:
-            r = requests.delete(f"http://127.0.0.1:8000/api/face/{id}/")
+            r = requests.delete(f"{self.serverAddress}/api/face/{id}/")
             response = r.status_code
             print (f'Status code: {response}')
             self.get_and_display_face()
         except Exception as e:
             print (e)
+
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                self.serverAddress = pickle.load(file)
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file

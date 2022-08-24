@@ -32,14 +32,16 @@ class DatabaseEntryBox(FloatLayout):
     imageReviewButton = ObjectProperty(None)
     imageLocationText = ObjectProperty(None)
     statusLabel = ObjectProperty(None)
-
     previewImageLocation = 'images/temp/preview/'
     isDataComplete = False
-
     aiModel = None
+    serverAddressFile = ''
 
-    def __init__(self, **kwargs):
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
         super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
 
     def button_press_callback(self, widget):
         if widget == self.selectFolderButton:
@@ -240,6 +242,16 @@ class DatabaseEntryBox(FloatLayout):
         self.add_text_on_widget(self.ids.review_data_label, '...') 
         self.isDataComplete = False
 
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                serverAddress = pickle.load(file)
+                return serverAddress
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+            return None
+
     def add_to_database(self, *args):
         # Run the function in databaseView object
         if self.isDataComplete:
@@ -248,7 +260,8 @@ class DatabaseEntryBox(FloatLayout):
                     'lastName' : self.newLastName,
                     'faceVector' : base64.b64encode(pickle.dumps(self.newFaceVector)).decode('ascii'),
                     'faceData' : base64.b64encode(pickle.dumps(self.newFaceData[0])).decode('ascii')}
-            r = requests.post(f"http://127.0.0.1:8000/api/face/", json = data)
+            serverAddress = self.get_server_address()
+            r = requests.post(f"{serverAddress}/api/face/", json = data)
             # Show new data to the database list layout
             self.manager.mainTabs.databaseView.get_and_display_face()
             self.reset_data()

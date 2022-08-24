@@ -68,7 +68,8 @@ class DeviceInfo(FloatLayout):
         self.no_selection_config()
 
     def display_info(self, deviceList, selectedDevice):
-        self.selectedDeviceName = selectedDevice.deviceName
+        print (selectedDevice)
+        self.selectedDeviceName = "TEST" #selectedDevice.deviceName
         self.selectedDeviceUrl = selectedDevice.deviceUrl
         self.visionAIActivated = selectedDevice.deviceVisionAI
         self.titleLabel.text = "Device Info"
@@ -78,7 +79,6 @@ class DeviceInfo(FloatLayout):
             self.neuralNetworkSwitch.active = True
         else:
             self.neuralNetworkSwitch.active = False
-
 
     def change_config(self, deviceList, isDeviceSelected, message = ""):
         print (isDeviceSelected)

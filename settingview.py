@@ -1,4 +1,5 @@
 import requests
+import pickle
 from kivy.lang import Builder
 from kivy.properties import ListProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
@@ -8,21 +9,18 @@ from deviceitem import DeviceItem
 from devicelist import DeviceList
 from serverbox import ServerBox
 from devicelistbox import DeviceListBox
+from settingcontentbox import SettingContentBox
 
 Builder.load_file("settingview.kv")
 
 class SettingView(BoxLayout):
 
-    leftBox = ObjectProperty(None)
-    deviceInfo = ObjectProperty(None)
     serverBox = ObjectProperty(None)
-    tAddress = ObjectProperty(None)
-    tName = ObjectProperty(None)
-    bAdd = ObjectProperty(None)
     devices = ListProperty([])
     deviceList = ObjectProperty(None)
+    settingContentBox = ObjectProperty(None)
+    serverAddress = ''
     
-
     def button_press_callback(self, widget):
         if widget == self.ids.device_delete_button:
             widget.source = "images/settingview/delete_device_down.png"
@@ -38,7 +36,7 @@ class SettingView(BoxLayout):
             deviceVisionAI = False
             requestData = {'deviceName': deviceName, 'showName': '', 'visionAI' : deviceVisionAI}
             try:
-                r = requests.post(f"http://127.0.0.1:8000/api/device/", data = requestData)
+                r = requests.post(f"{self.serverAddress}/api/device/", data = requestData)
                 response = r.status_code
                 print (f'Status code: {response}')
                 # Response by status code
@@ -54,62 +52,63 @@ class SettingView(BoxLayout):
             finally:
                 deviceEntry.isNewDevice = False
                 
-    def save_to_db(self, deviceInfo, editMode):
-        print ('save to db')
+    def save_device_to_db(self, content_obj):
         try:
-            if editMode == False:
-                # User pressed "Save"
-                deviceID = self.deviceList.selectedDevice.deviceID
-                newDeviceName = str(self.deviceInfo.deviceNameText.text)
-                newVisionAI = self.deviceInfo.visionAIActivated
-                deviceData = {'deviceName': newDeviceName, 'showName': '', 'visionAI' : newVisionAI}
-                r = requests.put(f"http://127.0.0.1:8000/api/device/{deviceID}/", data = deviceData)
-                response = r.status_code
-                print (f'Status code: {response}')
-                # Refresh the device list
-                self.deviceList.disabled = False
-                self.devices.clear()
-                # Force Device info to change config
-                self.deviceList.clear_selection()
-                self.deviceInfo.change_config(self.deviceList, self.deviceList.isDeviceSelected, message = "Changes saved...")
-                # Do something with Device List
-                self.deviceList.clear_widgets()
-                devices = self.get_devices()
-                # Populate device list from database
-                self.populate_items_to_list(self.deviceList, devices)
-                self.deviceInfo.dbDeviceNames = self.get_device_name_db()
-            else:
-                # Disable the device list
-                self.deviceList.disabled = True
-                
+            # User pressed "Save"
+            deviceID = self.deviceList.deviceListLayout.selectedDevice.deviceID
+            newDeviceName = str(content_obj.deviceNameText.text)
+            newWifiName = str(content_obj.wifiNameText.text)
+            newWifiPass = str(content_obj.wifiPassText.text)
+            newVisionAI = content_obj.visionAISwitch.active
+            deviceData = {'deviceName': newDeviceName, 'showName': '', 'visionAI' : newVisionAI}
+            r = requests.put(f"{self.serverAddress}/api/device/{deviceID}/", data = deviceData)
+            if r.status_code == 200:
+                # Get the new device attribute (json) form the sever
+                newDevice = self.get_device_detail(deviceID)
+                # Get current devices
+                for device in self.devices:
+                    if device.deviceID == newDevice['id']:
+                        device.deviceName = newDevice['deviceName']
+                        device.deviceVisionAI = newDevice['visionAI']
+                        self.settingContentBox.change_config(device)
+
         except Exception as e:
-            print ('Failure on saving to database')
-            print (e)
+            print (f'Failure on saving to database: {e}')
 
     def remove_from_db(self):
         print ('remove from db')
         try:
             if self.deviceList.selectedDevice: 
                 deviceID = self.deviceList.selectedDevice.deviceID
-                r = requests.delete(f"http://127.0.0.1:8000/api/device/{deviceID}/")
+                r = requests.delete(f"{self.serverAddress}/api/device/{deviceID}/")
                 response = r.status_code
                 print (f'Status code: {response}')
                 self.refresh_devices()
         except Exception as e:
             print (e)
 
+    def get_device_detail(self, device_id):
+         # Retrieve devices from server REST API. Return dict
+        try:
+            r = requests.get(f"{self.serverAddress}/api/device/{device_id}/")
+            device = r.json()
+            print(device)
+            return device
+        except Exception as e:
+            print (e)
+            return {}
+
     def get_devices(self):
         # Retrieve devices from server REST API
         try:
-            r = requests.get("http://127.0.0.1:8000/api/device")
+            r = requests.get(f"{self.serverAddress}/api/device/")
             device_response = r.json()  # Produce list of dict
             for device in device_response:
                 deviceID = device['id']
                 deviceName = device['deviceName']
                 deviceUrl = ''
                 deviceVisionAI = device['visionAI']
-                imagePath = "images/not_device_selected5.png"
-                self.devices.append(DeviceItem(deviceID = deviceID, deviceName = deviceName, deviceUrl = deviceUrl, deviceVisionAI = deviceVisionAI, imagePath=imagePath, size_hint = (None, None), size = (95,85)))
+                self.devices.append(DeviceItem(deviceID = deviceID, deviceName = deviceName, deviceUrl = deviceUrl, deviceVisionAI = deviceVisionAI))
         except Exception as e:
             print (e)
         finally:
@@ -130,30 +129,33 @@ class SettingView(BoxLayout):
         # Refresh the device list
         self.devices.clear()
         # Clear device list widgets
-        self.deviceList.clear_widgets()
-        self.get_devices()
-        for device in self.devices:
-            self.deviceList.add_widget(device)
+        self.deviceList.deviceListLayout.clear_widgets()
+        #self.get_devices()
+        #for device in self.devices:
+        #    self.deviceList.add_widget(device)
 
     def populate_items_to_list(self, listWidget, items):
         # Populate items to a list widget
         for item in items:
             listWidget.add_widget(item)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                self.serverAddress = pickle.load(file)
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+
+    def init_devices(self):
+        self.get_server_address()
         # Get devices
         devices = self.get_devices()
-        # Binding on_press event of add button
-        # self.deviceEntry.bind(isNewDevice = self.add_to_db)
-        # Device list
-        #self.deviceList.bind(selectedDevice = self.deviceInfo.display_info)
-        # Populate device list from database
+        # Populate the device to the device list layout
         self.populate_items_to_list(self.deviceList.deviceListLayout, devices)
-        # # Device info
-        self.deviceInfo.bind(editMode = self.save_to_db)
-        #self.deviceInfo.removeButton.bind(on_press = self.deviceList.clear_selection)
-        #self.deviceInfo.bind(visionAIActivated = self.deviceList.activate_neuralnet_to_selected_device)
-        self.deviceInfo.dbDeviceNames = self.get_device_name_db()
-        # Binding Device Info and Device List
-        #self.deviceList.bind(isDeviceSelected = self.deviceInfo.change_config)
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
+        self.init_devices()

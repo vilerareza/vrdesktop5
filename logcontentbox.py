@@ -39,7 +39,8 @@ class LogContentBox(BoxLayout):
     def get_detection_log(self, face_id):
         try:
             # Sending request
-            r = requests.get(f"http://127.0.0.1:8000/api/log/faceid/{face_id}/")
+            serverAddress = self.get_server_address()
+            r = requests.get(f"{serverAddress}/api/log/faceid/{face_id}/")
             # Getting and parsing response
             log_response = r.json()  # Produce list of dict
             print ('GET log OK')
@@ -73,14 +74,25 @@ class LogContentBox(BoxLayout):
                 )
             )
 
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                serverAddress = pickle.load(file)
+                return serverAddress
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+            return None
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
+
 class LogFaceStack (FocusBehavior, CompoundSelectionBehavior, StackLayout):
 
     frameLayout = ObjectProperty(None)
     selectedData = ObjectProperty(None)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.bind(selectedData = self.show_frame)
 
     def show_frame(self, *args):
         '''display corresponding frame in frameLayout'''
@@ -103,7 +115,8 @@ class LogFaceStack (FocusBehavior, CompoundSelectionBehavior, StackLayout):
     def get_frame_data (self, frame_id):
         try:
             # Sending request for frame
-            r = requests.get(f"http://127.0.0.1:8000/api/log/frame/{frame_id}/")
+            serverAddress = self.get_server_address()
+            r = requests.get(f"{serverAddress}/api/log/frame/{frame_id}/")
             frameData = r.json()['frameData']
             return frameData
         except Exception as e:
@@ -165,3 +178,19 @@ class LogFaceStack (FocusBehavior, CompoundSelectionBehavior, StackLayout):
 
     def on_selected_nodes(self,grid,nodes):
         pass
+
+    def get_server_address(self):
+        try:
+            # Load the server address
+            with open(self.serverAddressFile, 'rb') as file:
+                serverAddress = pickle.load(file)
+                return serverAddress
+        except Exception as e:
+            print(f'{e}: Failed loading server address: {e}')
+            return None
+
+    def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
+        super().__init__(**kwargs)
+        # Getting the server adrress, deserialize the serveraddress.p
+        self.serverAddressFile = server_address_file
+        self.bind(selectedData = self.show_frame)

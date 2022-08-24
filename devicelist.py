@@ -11,6 +11,7 @@ class DeviceList (FocusBehavior, CompoundSelectionBehavior, StackLayout):
     isDeviceSelected = BooleanProperty(False)
     # Handle property to the serverBox layout
     serverBox = ObjectProperty(None)
+    settingContentBox = ObjectProperty(None)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         if super().keyboard_on_key_down(window, keycode, text, modifiers):
@@ -46,9 +47,12 @@ class DeviceList (FocusBehavior, CompoundSelectionBehavior, StackLayout):
         self.isDeviceSelected = True
         # Clearing the selection in serverBox layout
         if self.serverBox:
-            self.serverBox.deselect_serverIcon()
+            self.serverBox.deselect_serverItem()
+        # Notify the setting content layout to change the content
+        if self.settingContentBox:
+            self.settingContentBox.change_config(node)
         return super().select_node(node)
-        
+
     def deselect_node(self, node):
         super().deselect_node(node)
         node.image.source = 'images/not_device_selected5.png'
