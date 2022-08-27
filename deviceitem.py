@@ -14,21 +14,25 @@ Builder.load_file("deviceitem.kv")
 class DeviceItem(FloatLayout):
     deviceID = NumericProperty(0)
     deviceName = StringProperty("")
-    deviceUrl = StringProperty("")
+    hostName = ''
+    wifiName = ''
+    wifiPass = ''
     image = ObjectProperty(None)
     label = ObjectProperty(None)
     color = ObjectProperty((0,0,0))
     visionAI = BooleanProperty(False)
     imagePath = "images/not_device_selected5.png"
 
-    def __init__(self, deviceID, deviceName, deviceUrl, deviceVisionAI, **kwargs):
+    def __init__(self, deviceID, deviceName, host_name, wifi_name, wifi_pass, deviceVisionAI, **kwargs):
         super().__init__(**kwargs)
         #self.orientation = 'vertical'
         self.padding = [10]
         self.spacing = 10
         self.deviceID = deviceID
         self.deviceName = deviceName
-        self.deviceUrl = deviceUrl
+        self.hostName = host_name
+        self.wifiName = wifi_name
+        self.wifiPass = wifi_pass
         self.deviceVisionAI = deviceVisionAI
         #self.image = Image (source=imagePath, mipmap = True, size_hint = (1,1), pos_hint = {'center_x':0.5, 'center_y':0.5})
         #self.label = ColorLabel(text="[color=dddddd]"+deviceName+"[/color]", font_size = 16, font_family = "arial", halign = "center", valign = "top", size_hint = (None, None), size = (80,25), pos_hint = {'center_x':0.5, 'top': 1}, markup = True)

@@ -48,9 +48,12 @@ class MainTabs(TabbedPanel):
         if tab.state == "down":
             # Stop the multiview
             self.multiView.stop()
+            self.settingView.start_server_checker()
     
     def refreshMultiView(self, tab):
         if tab.state == "down":
+            # Stop the settingview
+            self.settingView.stop()
             # Refresh the device list
             self.multiView.get_server_address()
             self.multiView.get_data_from_db()
@@ -62,13 +65,18 @@ class MainTabs(TabbedPanel):
         if tab.state == "down":
             # Stop the multiview
             self.multiView.stop()
+            # Stop the settingview
+            self.settingView.stop()
             self.databaseView.get_server_address()
     
     def tabLogViewPressed(self, tab):
         if tab.state == "down":
             # Stop the multiview
             self.multiView.stop()
+            # Stop the settingview
+            self.settingView.stop()
             self.logView.get_server_address()
             
     def stop(self):
         self.multiView.stop()
+        self.settingView.stop()

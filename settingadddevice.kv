@@ -4,13 +4,14 @@
     deviceNameText: device_name_text
     wifiNameLabel: wifi_name_label
     wifiNameText: wifi_name_text
-    wifiPassLabel: wifi_name_label
-    wifiPassText: wifi_name_text
+    wifiPassLabel: wifi_pass_label
+    wifiPassText: wifi_pass_text
     visionAILabel: visionai_label
     visionAISwitch: visionai_switch
     btnAdd: btn_add
     btnCancel: btn_cancel
     qrImage : qr_image
+    btnClose: btn_close
 
     Label:
         id: title_label
@@ -45,7 +46,6 @@
         id: device_name_text
         x_offset : 0.2
         foreground_color: (0.1, 0.1, 0.1)
-        #background_color: (0.8, 0.8, 0.8)
         multiline : False
         font_size: 20
         font_family: "arial"
@@ -67,7 +67,7 @@
         halign : 'left' 
         valign : 'bottom'
         pos_hint : {'x':self.x_offset}
-        top: device_name_text.y - dp(15)
+        top: device_name_text.y - dp(12)
         size_hint : (None, None)
         size : dp(120), dp(20)
 
@@ -75,7 +75,6 @@
         id: wifi_name_text
         x_offset : 0.2
         foreground_color: (0.1, 0.1, 0.1)
-        #background_color: (0.8, 0.8, 0.8)
         multiline : False
         font_size: 20
         font_family: "arial"
@@ -97,7 +96,7 @@
         halign : 'left' 
         valign : 'bottom'
         pos_hint : {'x':self.x_offset}
-        top: wifi_name_text.y - dp(15)
+        top: wifi_name_text.y - dp(12)
         size_hint : (None, None)
         size : dp(120), dp(20)
 
@@ -105,7 +104,6 @@
         id: wifi_pass_text
         x_offset : 0.2
         foreground_color: (0.1, 0.1, 0.1)
-        #background_color: (0.8, 0.8, 0.8)
         multiline : False
         font_size: 20
         font_family: "arial"
@@ -137,26 +135,29 @@
         size : (dp(90), dp(30))
         right : wifi_name_text.right
         center_y : visionai_label.center_y
+        active: True
 
     ImageButton:
         id : btn_add
-        source: 'images/settingview/btn_add_normal.png'
+        source: 'images/settingview/btn_add.png'
         size_hint: (None, None)
-        size: (dp(150), dp(30))
+        size: (dp(150), dp(35))
         x : visionai_label.x
         top: visionai_switch.y - dp(20)
         on_press: root.button_press_callback(self)
         on_release: root.button_release_callback(self), root.add_new_device(device_name_text, wifi_name_text, wifi_pass_text)
-            
+        opacity: 1.0 if self.disabled == False else 0.7
+
     ImageButton:
         id : btn_cancel
-        source: 'images/settingview/btn_cancel_normal.png'
+        source: 'images/settingview/btn_cancel.png'
         size_hint: (None, None)
-        size: (dp(135), dp(30))
+        size: (dp(135), dp(35))
         x : btn_add.right + dp(15)
         y : btn_add.y
         on_press: root.button_press_callback(self)
         on_release: root.button_release_callback(self)
+        opacity: 1.0 if self.disabled == False else 0.7
 
     Image:
         id: qr_image
@@ -164,13 +165,17 @@
         size: (dp(180), dp(180))
         source: "images/settingview/qr_empty.png"
         center_x : device_name_text.center_x
-        top: btn_add.y - dp(35)
-        #canvas.before:
-        #    Color:
-        #        rgb : (0.7,0.45,0.45)
-        #    Rectangle:
-        #        size : self.size
-        #        pos : self.pos
+        top: btn_add.y - dp(20)
+
+    ImageButton:
+        id : btn_close
+        source: 'images/settingview/btn_close.png'
+        size_hint: (None, None)
+        size: (dp(90), dp(30))
+        center_x : qr_image.center_x
+        top: qr_image.y - dp(20)
+        on_press: root.button_press_callback(self)
+        on_release: root.button_release_callback(self)
 
 <ImageButton@ButtonBehavior+Image>:
 <ImageLabelButton@ButtonBehavior+FloatLayout>

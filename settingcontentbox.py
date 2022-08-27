@@ -22,13 +22,10 @@ class SettingContentBox(BoxLayout):
     settingAddDevice = SettingAddDevice()
 
     def change_config(self, obj = None):
-        print (obj)
-        print (type(obj))
         self.clear_widgets()
-        #print (f'{requester}, {obj}')
         if type(obj) == DeviceItem:
             # Filling the settingContentDevice with object attribute
-            self.settingContentDevice.fill(obj)
+            self.settingContentDevice.get_device_obj(obj)
             self.add_widget(self.settingContentDevice)
         elif obj == self.deviceList:
             # Add device. Show settingAddDevice
@@ -47,6 +44,10 @@ class SettingContentBox(BoxLayout):
         # Reinitializing devices
         self.settingView.refresh_devices()
         self.settingView.init_devices()
+
+    def update_deviceitem(self, new_device):
+        # Update the edited device. new_device_obj is the new data for edited device
+        self.settingView.update_deviceitem(new_device)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

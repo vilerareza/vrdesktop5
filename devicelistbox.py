@@ -6,14 +6,18 @@ from devicelist import DeviceList
 Builder.load_file('devicelistbox.kv')
 
 class DeviceListBox(BoxLayout):
+    settingView = ObjectProperty(None)
     deviceListLayout = ObjectProperty(None)
     serverBox = ObjectProperty(None)
     settingContentBox = ObjectProperty(None)
     btnDeviceAdd = ObjectProperty(None)
+    btnRefresh = ObjectProperty
 
     def button_press_callback(self, button):
         if button == self.btnDeviceAdd:
             button.source = 'images/settingview/btn_add_icon_down.png'
+        elif button == self.btnRefresh:
+            button.source = 'images/settingview/btn_refresh_down.png'
 
     def button_release_callback(self, button):
         if button == self.btnDeviceAdd:
@@ -22,3 +26,8 @@ class DeviceListBox(BoxLayout):
             # Clear selection on serverBox or deviceListLayout
             self.serverBox.deselect_serverItem()
             self.deviceListLayout.clear_selection()
+        elif button == self.btnRefresh:
+            button.source = 'images/settingview/btn_refresh.png'
+            # Refresh the devices in device list layout
+            self.settingView.refresh_devices()
+            self.settingView.init_devices()

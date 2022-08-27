@@ -2,8 +2,8 @@
     titleLabel: title_label
     serverAddressLabel: server_address_label
     serverAddressText: server_address_text
-    btnSave: btn_save
-    btnTest: btn_test
+    btnSaveEdit: btn_save_edit
+    #btnTest: btn_test
     testLabel : test_label
     testImage : test_image
 
@@ -48,6 +48,8 @@
         top: server_address_label.y - dp(3)
         background_normal : "images/settingview/text_normal.png"
         background_active : "images/settingview/text_normal.png"
+        background_disabled_normal : "images/settingview/text_normal.png"
+        disabled : True
 
     Label:
         id : test_label
@@ -60,7 +62,7 @@
         size_hint: (None, None)
         size: (dp(135), dp(20))
         center_x : server_address_text.center_x
-        y : btn_test.top + dp(10)
+        y : btn_save_edit.top + dp(10)
 
     Image:
         id: test_image
@@ -71,24 +73,28 @@
         center_y : test_label.center_y
         opacity : 0
 
-    ImageButton:
-        id : btn_test
-        source: 'images/settingview/btn_test_normal.png'
+    #ImageButton:
+    #    id : btn_test
+    #    source: 'images/settingview/btn_test_normal.png'
+    #    size_hint: (None, None)
+    #    size: (dp(300), dp(35))
+    #    x : server_address_text.x
+    #    top: server_address_text.y - dp(50)
+    #    on_press: root.button_press_callback(self)
+    #    on_release: root.button_release_callback(self)
+
+    ImageToggle:
+        id : btn_save_edit
+        source: 'images/settingview/btn_edit_server.png'
         size_hint: (None, None)
         size: (dp(300), dp(35))
+        #x : btn_test.x
+        #top : btn_test.y - dp(20)
         x : server_address_text.x
         top: server_address_text.y - dp(50)
-        on_press: root.button_press_callback(self)
-        on_release: root.button_release_callback(self)
-
-    ImageButton:
-        id : btn_save
-        source: 'images/settingview/btn_save_server_normal.png'
-        size_hint: (None, None)
-        size: (dp(300), dp(35))
-        x : btn_test.x
-        top : btn_test.y - dp(20)
-        on_press: root.button_press_callback(self)
-        on_release: root.button_release_callback(self)
+        on_state: root.toggle_press_callback(self)
+        #on_press: root.button_press_callback(self)
+        #on_release: root.button_release_callback(self)
 
 <ImageButton@ButtonBehavior+Image>:
+<ImageToggle@ToggleButtonBehavior+Image>:

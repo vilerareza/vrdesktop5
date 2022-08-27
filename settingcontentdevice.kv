@@ -5,11 +5,12 @@
     wifiNameLabel: wifi_name_label
     wifiNameText: wifi_name_text
     wifiPassLabel: wifi_name_label
-    wifiPassText: wifi_name_text
+    wifiPassText: wifi_pass_text
     visionAILabel: visionai_label
     visionAISwitch: visionai_switch
     btnSaveEdit: btn_save_edit
     btnRemove: btn_remove
+    qrImage: qr_image
 
     Label:
         id: title_label
@@ -35,7 +36,6 @@
         top: title_label.y - dp(20)
         on_press: root.button_press_callback(self)
         on_release: root.button_release_callback(self)
-
 
     ImageToggle:
         id: btn_save_edit
@@ -161,6 +161,13 @@
         center_y : visionai_label.center_y
         disabled: True if root.editMode == False else False
 
+    Image:
+        id: qr_image
+        size_hint : (None, None)
+        size: (dp(180), dp(180))
+        source: "images/settingview/qr_empty.png"
+        center_x : device_name_text.center_x
+        top: visionai_switch.y - dp(35)
 
 <ImageButton@ButtonBehavior+Image>:
 <ImageToggle@ToggleButtonBehavior+Image>:
