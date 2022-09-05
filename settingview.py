@@ -6,7 +6,6 @@ from kivy.lang import Builder
 from kivy.properties import ListProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 
-from deviceentry import DeviceEntry
 from deviceinfo import DeviceInfo
 from deviceitem import DeviceItem
 from devicelist import DeviceList

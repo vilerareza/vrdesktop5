@@ -5,17 +5,19 @@ from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.uix.behaviors import FocusBehavior
 
+
 class DatabaseListLayout (FocusBehavior, CompoundSelectionBehavior, StackLayout):
 
+    databaseContentBox = ObjectProperty
     selectedData = ObjectProperty(None)
     isDataSelected = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.bind(selectedData = self.inform_selection)
+        #self.bind(selectedData = self.inform_selection)
 
-    def inform_selection(self, layout, selected_data):
-        App.get_running_app().manager.mainTabs.databaseView.display_data_content(selected_data)
+    # def inform_selection(self, layout, selected_data):
+    #     App.get_running_app().manager.mainTabs.databaseView.display_data_content(selected_data)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         if super().keyboard_on_key_down(window, keycode, text, modifiers):
@@ -33,20 +35,24 @@ class DatabaseListLayout (FocusBehavior, CompoundSelectionBehavior, StackLayout)
 
     def add_widget(self, widget):
         super().add_widget(widget)
-        widget.bind(on_touch_down = self.widget_touch_down, on_touch_up = self.widget_touch_up)
+        widget.bind(on_touch_down = self.widget_touch_down)
     
     def widget_touch_down(self, widget, touch):
         if widget.collide_point(*touch.pos):
             self.select_with_touch(widget, touch)
     
-    def widget_touch_up(self, widget, touch):
-        if self.collide_point(*touch.pos) and (not (widget.collide_point(*touch.pos) or self.touch_multiselect)):
-            self.deselect_node(widget)
+    # def widget_touch_up(self, widget, touch):
+    #     if self.collide_point(*touch.pos) and (not (widget.collide_point(*touch.pos) or self.touch_multiselect)):
+    #         pass
+    #         self.deselect_node(widget)
     
     def select_node(self, node):
         node.backgroundImage.source = 'images/databaseview/databaseitem_selected.png'
         self.selectedData = node
         self.isDataSelected = True
+        # Display the face info in the face content box
+        if self.databaseContentBox:
+            self.databaseContentBox.change_config(node)
         return super().select_node(node)
         
     def deselect_node(self, node):

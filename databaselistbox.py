@@ -4,14 +4,17 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 from databaselistlayout import DatabaseListLayout
 from databaseitem import DatabaseItem
+from databasecontentbox import DatabaseContentBox
 
 Builder.load_file('databaselistbox.kv')
 
 class DatabaseListBox(BoxLayout):
 
+    databaseView = ObjectProperty(None)
+    databaseContentBox = ObjectProperty(None)
     databaseListLayout = ObjectProperty(None)
-    saveFile = BooleanProperty(False)
-    deleteFile = BooleanProperty(False)
+    btnAdd = ObjectProperty(None)
+    btnRefresh = ObjectProperty
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -20,16 +23,17 @@ class DatabaseListBox(BoxLayout):
         self.databaseListLayout.add_widget(DatabaseItem(data_list = data_list))
 
     def button_press_callback(self, widget):
-        if widget == self.ids.database_delete_button:
-            widget.source = "images/databaseview/database_delete_down.png"
-        elif widget == self.ids.database_load_button:
-            widget.source = "images/databaseview/database_load_down.png"
+        if widget == self.btnAdd:
+            widget.source = "images/databaseview/btn_add_icon_down.png"
+        elif widget == self.btnRefresh:
+            widget.source = "images/databaseview/btn_refresh_down.png"
 
     def button_release_callback(self, widget):
-        if widget == self.ids.database_delete_button:
-            widget.source = "images/databaseview/database_delete_normal.png"
-        elif widget == self.ids.database_load_button:
-            widget.source = "images/databaseview/database_load_normal.png"
+        if widget == self.btnAdd:
+            widget.source = "images/databaseview/btn_add_icon.png"
+            self.databaseContentBox.change_config(self)
+        elif widget == self.btnRefresh:
+            widget.source = "images/databaseview/btn_refresh.png"
 
     def remove_item(self):
         # Remove selected data in database list layout from database 
