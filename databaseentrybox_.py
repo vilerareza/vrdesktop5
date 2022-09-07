@@ -37,7 +37,6 @@ class DatabaseEntryBox(FloatLayout):
     aiModel = None
     serverAddressFile = ''
 
-
     def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
         super().__init__(**kwargs)
         # Getting the server adrress, deserialize the serveraddress.p

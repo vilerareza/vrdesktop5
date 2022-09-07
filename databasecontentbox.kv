@@ -1,13 +1,7 @@
 <DatabaseContentBox>:
-
-    noSelectionLabel : no_selection_label
-
-    Label:
-        id: no_selection_label
-        #text: root.noSelectionText
-        font_size : 20
-        font_family : 'arial'
-        halign : 'center'
-        valign : 'middle'
-        pos_hint : {'center_x':0.5, 'center_y': 0.55}
-        text_size : self.size
+    canvas.before:
+        Color:
+            rgb : (0.45,0.45,0.45)
+        Rectangle:
+            size : self.size
+            pos : self.pos

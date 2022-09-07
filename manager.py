@@ -64,17 +64,6 @@ class Manager(BoxLayout):
                 newTab.background_normal = 'images/tab_log_normal.png'
                 newTab.background_down = 'images/tab_log_down.png'
                 self.headerBar.tabStrip.add_widget(newTab)
-
-    def create_vision_ai(self):
-        if not self.aiModel:
-            try:
-                from ai_model import AIModel
-                self.aiModel = AIModel(recognition = True, model_location = "C:/Users/Reza Vilera/.deepface/loaded_model/vgg_model_loaded.h5")
-                print ('model created')
-            except Exception as e:
-                print (f'Error on activating Vision AI {e}')
-        
-        return self.aiModel
     
     def get_vision_ai(self):
         return self.aiModel

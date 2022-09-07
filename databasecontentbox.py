@@ -5,15 +5,17 @@ from kivy.uix.boxlayout import BoxLayout
 
 from databaseitem import DatabaseItem, FaceObjectWidget
 from databasecontentface import DatabaseContentFace
+from databaseaddface import DatabaseAddFace
+from databasenoselection import DatabaseNoSelection
 
 Builder.load_file("databasecontentbox.kv")
 
 class DatabaseContentBox(BoxLayout):
     databaseView = ObjectProperty(None)
     databaseListBox = ObjectProperty(None)
-    noSelectionLabel = ObjectProperty(None)
+    noSelectionLabel = DatabaseNoSelection()
     databaseContentFace = DatabaseContentFace()
-    #faceAdd = SettingAddDevice()
+    databaseAddFace = DatabaseAddFace()
 
     def change_config(self, obj = None):
         print(type(obj))
@@ -23,25 +25,19 @@ class DatabaseContentBox(BoxLayout):
             self.databaseContentFace.fill(obj)
             self.add_widget(self.databaseContentFace)
         elif obj == self.databaseListBox:
-            print ('adding a face')
-            # Add device. Show settingAddDevice
-            # self.add_widget(self.settingAddDevice)
-        # elif type(obj) == ServerItem:
-        #     # Server setting. Show settingContentServer
-        #     self.settingContentServer.fill(obj)
-        #     self.add_widget(self.settingContentServer)
+            # Add new face to database. Show databaseaddface
+            self.add_widget(self.databaseAddFace)
 
-    def no_selection_config(self, text):
-        # Clearing widgets
+    def no_selection_config(self, text=''):
+        #Clearing widgets
         self.clear_widgets()
-        self.noSelectionLabel.text = text
+        if text != '':
+           self.noSelectionLabel.text = text
         self.add_widget(self.noSelectionLabel)
 
-    def reinit_faces(self):
-        pass
-        # Reinitializing devices
-        # self.settingView.refresh_devices()
-        # self.settingView.init_devices()
+    def request_parent_refresh(self):
+        # Refresh face list
+        self.databaseView.refresh()
 
     def update_database_item(self, new_data):
         # Update the edited data.

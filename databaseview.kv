@@ -1,4 +1,3 @@
-#: import databaseentrybox databaseentrybox
 #: import databaselistbox databaselistbox
 
 <DatabaseView>:
@@ -17,17 +16,3 @@
         id : face_content_box
         databaseView: root
         databaseListBox : database_list_box
-        canvas.before:
-            Color:
-                rgb : (0.45,0.45,0.45)
-            Rectangle:
-                size : self.size
-                pos : self.pos
-
-    #BoxLayout:
-    #    id: bottom_container_box
-    #    orientation: 'horizontal'
-        
-    #    DatabaseInfoBox:
-    #        id : database_info_box
-    #        size_hint : (0.5, 1)

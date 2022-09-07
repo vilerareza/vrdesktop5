@@ -43,10 +43,7 @@ class FaceObjectWidget(ButtonBehavior, FloatLayout):
         self.dataID = str_datalist[0]
         self.dataFirstName = str_datalist[1]
         self.dataLastName = str_datalist[2]
-        self.imgDataList = [img_datalist]
-        #self.ids.data_id_label.text = self.dataID
-        #self.ids.data_firstname_label.text = self.dataFirstName
-        #self.ids.data_lastname_label.text = self.dataLastName 
+        self.imgDataList = img_datalist
         self.dataImage.texture = face_texture
     
     def get_data(self):

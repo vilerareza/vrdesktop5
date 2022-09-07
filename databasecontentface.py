@@ -1,4 +1,3 @@
-import os
 import io
 import requests
 import pickle
@@ -58,7 +57,7 @@ class DatabaseContentFace(FloatLayout):
 
     def save_change_to_db(self):
 
-        # '''child function to retrieve devices from server REST API. Return dict'''
+        '''child function to retrieve devices from server REST API. Return dict'''
         def get_face_detail(server_address, id):
             try:
                 r = requests.get(f"{server_address}/api/face/{id}/")
@@ -86,6 +85,17 @@ class DatabaseContentFace(FloatLayout):
         except Exception as e:
             print (f'save_change_db: {e}')
 
+    def remove_from_db(self, id):
+        try:
+            serverAddress = self.get_server_address()
+            r = requests.delete(f"{serverAddress}/api/face/{id}/")
+            response = r.status_code
+            print (f'Status code: {response}')
+        except Exception as e:
+            print (f'remove_from_db {e}')
+        finally:
+            self.parent.request_parent_refresh()
+
     def get_server_address(self):
         try:
             # Load the server address
@@ -101,7 +111,7 @@ class DatabaseContentFace(FloatLayout):
         if button == self.btnSaveEdit:
             if button.state == 'down':
                 self.editMode = True
-                button.source = 'images/databaseview/btn_save.png'
+                button.source = 'images/databaseview/btn_save_change.png'
             else:
                 self.editMode = False
                 button.source = 'images/databaseview/btn_edit.png'
@@ -115,6 +125,7 @@ class DatabaseContentFace(FloatLayout):
     def button_release_callback(self, widget):
         if widget == self.btnRemove:
             widget.source = 'images/databaseview/btn_remove.png'
+            self.remove_from_db(self.id)
     
     def __init__(self, server_address_file='data/serveraddress.p', **kwargs):
         super().__init__(**kwargs)
